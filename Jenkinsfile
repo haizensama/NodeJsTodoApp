@@ -3,6 +3,10 @@ pipeline {
 	tools {
 		nodejs "npm"
 	}
+	environment {
+		DOCKER_HUB_CREDENTIALS_ID = 'jen-dockerhub'
+		DOCKER_HUB_REPO = 'haizen12/nodejstodoapp'
+	}
 	stages {
 		stage('Git Checkout'){
 			steps {
@@ -21,6 +25,22 @@ pipeline {
 //				sh 'npm test'
 //			}
 //		}
+		stage('Build Docker Image'){
+			steps {
+				script {
+					dockerImage = docker.build("${DOCKER_HUB_REPO}:latest")
+				}
+			}
+		}
+		stage('Push Image to DockerHub'){
+			steps {
+				script {
+					docker.withRegistry('https://registry.hub.docker.com', "${DOCKER_HUB_CREDENTIALS_ID}"){
+						dockerImage.push('latest')
+					}
+				}
+			}
+		}
 
 	}
 
