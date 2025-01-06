@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: NodeJsToDoApp
-        image: iquantc/iquant-app:latest
+        image: haizen12/nodejstodoapp:latest
         ports:
         - containerPort: 3000
       imagePullSecrets:
