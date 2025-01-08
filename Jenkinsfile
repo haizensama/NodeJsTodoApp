@@ -47,8 +47,8 @@ pipeline {
 
         stage('Install Kubectl') {
             steps {
-               sh '''
-     # Install kubectl
+sh '''
+            # Install kubectl
             curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
             chmod +x kubectl
             mv kubectl $HOME/bin/kubectl
@@ -60,7 +60,7 @@ pipeline {
 
             # Ensure $HOME/bin is in the PATH
             echo "export PATH=$HOME/bin:$PATH" >> $HOME/.bashrc
-            source $HOME/.bashrc
+            . $HOME/.bashrc
 
             # Start Minikube
             minikube start --driver=docker
@@ -68,7 +68,7 @@ pipeline {
             # Configure kubectl
             kubectl config set-cluster minikube --server=https://192.168.49.2:8443
             kubectl config use-context minikube
-'''
+        '''
 
             }
         }
