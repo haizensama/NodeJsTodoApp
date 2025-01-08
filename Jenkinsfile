@@ -70,15 +70,15 @@ sh '''
             echo "export PATH=$HOME/bin:$PATH" >> $HOME/.bashrc
             . $HOME/.bashrc
 
-            # Start Minikube as root with --force to bypass docker driver restriction
+            # Increase Minikube timeout and start Minikube as root with --force
             echo "Running Minikube as root with --force"
-            minikube start --driver=docker --force --timeout=600s
+            export MINIKUBE_WAIT_TIMEOUT=600s
+            minikube start --driver=docker --force
 
             # Configure kubectl
             kubectl config set-cluster minikube --server=https://192.168.49.2:8443
             kubectl config use-context minikube
         '''
-
             }
         }
 
