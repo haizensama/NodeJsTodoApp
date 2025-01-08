@@ -50,7 +50,7 @@ pipeline {
                sh '''
     curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
     chmod +x kubectl
-    sudo mv kubectl /usr/local/bin/kubectl
+    mv kubectl /usr/local/bin/kubectl
     minikube start --driver=docker
     kubectl config set-cluster minikube --server=https://192.168.49.2:8443
     kubectl config use-context minikube
