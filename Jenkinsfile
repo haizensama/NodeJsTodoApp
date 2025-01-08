@@ -48,9 +48,9 @@ pipeline {
         stage('Install Kubectl') {
             steps {
                sh '''
-    # Create the $HOME/bin directory if it doesn't exist
+     # Create the $HOME/bin directory if it doesn't exist
             mkdir -p $HOME/bin
-            
+
             # Install kubectl (without sudo)
             curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
             chmod +x kubectl
@@ -63,11 +63,10 @@ pipeline {
             # Install Minikube to $HOME/bin
             mv minikube-linux-amd64 $HOME/bin/minikube
 
-            # Add $HOME/bin to the PATH
-            echo "export PATH=$HOME/bin:$PATH" >> $HOME/.bashrc
-            source $HOME/.bashrc
+            # Add $HOME/bin to the PATH without using source
+            echo "export PATH=$HOME/bin:$PATH" >> $HOME/.bash_profile
 
-            # Start Minikube without sudo
+            # Start Minikube without sudo (ensure user is added to docker group beforehand)
             minikube start --driver=docker
 
             # Configure kubectl
