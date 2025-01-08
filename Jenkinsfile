@@ -6,7 +6,6 @@ pipeline {
     environment {
         DOCKER_HUB_CREDENTIALS_ID = 'jen-dockerhub'
         DOCKER_HUB_REPO = 'haizen12/nodejstodoapp'
-        KUBECONFIG = "${HOME}/.kube/config"
     }
     stages {
         stage('Git Checkout') {
@@ -47,45 +46,18 @@ pipeline {
 
         stage('Install Kubectl') {
             steps {
-sh '''
-            # Delete any existing Minikube cluster
-            minikube delete
-
-            # Create the $HOME/bin directory if it doesn't exist
-            mkdir -p $HOME/bin
-
-            # Install kubectl (without sudo)
-            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-            chmod +x kubectl
-            # Install kubectl to $HOME/bin
-            mv kubectl $HOME/bin/kubectl
-
-            # Install Minikube (without sudo)
-            curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-            chmod +x minikube-linux-amd64
-            # Install Minikube to $HOME/bin
-            mv minikube-linux-amd64 $HOME/bin/minikube
-
-            # Add $HOME/bin to the PATH
-            echo "export PATH=$HOME/bin:$PATH" >> $HOME/.bashrc
-            . $HOME/.bashrc
-
-            # Increase Minikube timeout and start Minikube as root with --force
-            echo "Running Minikube as root with --force"
-            export MINIKUBE_WAIT_TIMEOUT=600s
-            minikube start --driver=docker --force
-
-            # Configure kubectl
-            kubectl config set-cluster minikube --server=https://192.168.49.2:8443
-            kubectl config use-context minikube
-        '''
+                sh '''
+                    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                    chmod +x kubectl
+                    mv kubectl /usr/local/bin/kubectl
+                '''
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                    kubeconfig(caCertificate: 'LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJWkFUZk4vWmNuUUl3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TlRBeE1EWXhOakUxTlROYUZ3MHpOVEF4TURReE5qSXdOVE5hTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUURRVEpKOW5nRXErdG9zQkNac0JKY2RnOWxDbFhSSkI5czlHdW9nTGJudDdtTjl4K1JZWCtxNlNscncKcitJQjVNUDF1eFY5U3pWOTVLdW5XUmNHQUdJNHNjM2szS09ITm4yYk9CUlR6V09wamx2RFFjYjJVZkF1ZGlYZgp2YUpyRUx6YjNUVUsrSndiOUszRG1Sekg2azIrb3p6SG1MODlLRkFKelZXN2dscm1SZW1BRHVKRENFeTQwNVpHCjZpSE5BalgvZHh4bE95MWlnbkFhaFFXMjRCZnhaY0pDdUFMMWJaNHNCQmgzc29zUWtnNnBCYVdOcEtWMEhYNHcKY2tHK0I4SERhLzRFVy9BQVlpNTJETGlmR3JKeGc2T2xQVy9DSnQxN3pwNm45cHpTaXV5c2ZvaGpIb1Yxa0tHWApLcmhNQTlBeWRXNlBsOW1wVmRTNEJCR0RxK2J4QWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJSVUNWeFgzdG1hWjJ0a1dXV1o5VE9wMkt2WUNUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQTZ5cE9wNkRSWgpIT1BTSEJpZXNtQjdMUi9UQ3FWMGVqMFl4bnBqa0NxcXFJWk5DZjBiRHhCOGJKamUvSURTbjZFWjNzbzBrZCt2CnM3anY1TDhhdXl2ZGZHQmFTRTJmUUNxbGNPbExSU2FGSzEraDNmYWVOYmE2c1g3dnQrZFc3SlFVWGtrN2ZDR2kKc1Q5dWdhbm5jNThabk52YUE4RW5mSXl6ajViYTlCNUhGb0ZQSlJkQk5yZENKRCt1K0x0Z2RiMFZGdngwU2E0eQpoUElnWlBvRUs2YmtIaDNkYXAyRHA1NDJEN29NQUt5SUJlNFF1akRrTWt0U09kSExNN3RvcEFmMVlIVkV6aVQ3CnBVU1ZZVHdxdnRFZVJYQVdlZjJKdE01ZUhEcG9VWit2NzNDNlM1bE9CTkNVekh6STIzK3YyaDFzWVNiaDdwNjEKQnZHYmlteWRibFNkCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K', credentialsId: 'kubeconfignew', serverUrl: '192.168.49.2:8443 ') {
+                    kubeconfig(caCertificate: 'LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURCVENDQWUyZ0F3SUJBZ0lJWkFUZk4vWmNuUUl3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB5TlRBeE1EWXhOakUxTlROYUZ3MHpOVEF4TURReE5qSXdOVE5hTUJVeApFekFSQmdOVkJBTVRDbXQxWW1WeWJtVjBaWE13Z2dFaU1BMEdDU3FHU0liM0RRRUJBUVVBQTRJQkR3QXdnZ0VLCkFvSUJBUURRVEpKOW5nRXErdG9zQkNac0JKY2RnOWxDbFhSSkI5czlHdW9nTGJudDdtTjl4K1JZWCtxNlNscncKcitJQjVNUDF1eFY5U3pWOTVLdW5XUmNHQUdJNHNjM2szS09ITm4yYk9CUlR6V09wamx2RFFjYjJVZkF1ZGlYZgp2YUpyRUx6YjNUVUsrSndiOUszRG1Sekg2azIrb3p6SG1MODlLRkFKelZXN2dscm1SZW1BRHVKRENFeTQwNVpHCjZpSE5BalgvZHh4bE95MWlnbkFhaFFXMjRCZnhaY0pDdUFMMWJaNHNCQmgzc29zUWtnNnBCYVdOcEtWMEhYNHcKY2tHK0I4SERhLzRFVy9BQVlpNTJETGlmR3JKeGc2T2xQVy9DSnQxN3pwNm45cHpTaXV5c2ZvaGpIb1Yxa0tHWApLcmhNQTlBeWRXNlBsOW1wVmRTNEJCR0RxK2J4QWdNQkFBR2pXVEJYTUE0R0ExVWREd0VCL3dRRUF3SUNwREFQCkJnTlZIUk1CQWY4RUJUQURBUUgvTUIwR0ExVWREZ1FXQkJSVUNWeFgzdG1hWjJ0a1dXV1o5VE9wMkt2WUNUQVYKQmdOVkhSRUVEakFNZ2dwcmRXSmxjbTVsZEdWek1BMEdDU3FHU0liM0RRRUJDd1VBQTRJQkFRQTZ5cE9wNkRSWgpIT1BTSEJpZXNtQjdMUi9UQ3FWMGVqMFl4bnBqa0NxcXFJWk5DZjBiRHhCOGJKamUvSURTbjZFWjNzbzBrZCt2CnM3anY1TDhhdXl2ZGZHQmFTRTJmUUNxbGNPbExSU2FGSzEraDNmYWVOYmE2c1g3dnQrZFc3SlFVWGtrN2ZDR2kKc1Q5dWdhbm5jNThabk52YUE4RW5mSXl6ajViYTlCNUhGb0ZQSlJkQk5yZENKRCt1K0x0Z2RiMFZGdngwU2E0eQpoUElnWlBvRUs2YmtIaDNkYXAyRHA1NDJEN29NQUt5SUJlNFF1akRrTWt0U09kSExNN3RvcEFmMVlIVkV6aVQ3CnBVU1ZZVHdxdnRFZVJYQVdlZjJKdE01ZUhEcG9VWit2NzNDNlM1bE9CTkNVekh6STIzK3YyaDFzWVNiaDdwNjEKQnZHYmlteWRibFNkCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K', clusterName: '', contextName: '', credentialsId: 'kubeconfig', namespace: '', restrictKubeConfigAccess: false, serverUrl: 'https://kubernetes.docker.internal:6443') {
                         sh 'kubectl apply -f deployment.yaml'
                     }
                 }
