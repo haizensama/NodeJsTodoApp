@@ -48,6 +48,9 @@ pipeline {
         stage('Install Kubectl') {
             steps {
 sh '''
+            # Delete any existing Minikube cluster
+            minikube delete
+
             # Create the $HOME/bin directory if it doesn't exist
             mkdir -p $HOME/bin
 
@@ -69,7 +72,7 @@ sh '''
 
             # Start Minikube as root with --force to bypass docker driver restriction
             echo "Running Minikube as root with --force"
-            minikube start --driver=docker --force
+            minikube start --driver=docker --force --timeout=600s
 
             # Configure kubectl
             kubectl config set-cluster minikube --server=https://192.168.49.2:8443
