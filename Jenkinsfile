@@ -48,12 +48,22 @@ pipeline {
         stage('Install Kubectl') {
             steps {
                sh '''
-    curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    chmod +x kubectl
-    mv kubectl /usr/local/bin/kubectl
-    minikube start --driver=docker
-    kubectl config set-cluster minikube --server=https://192.168.49.2:8443
-    kubectl config use-context minikube
+    # Install kubectl
+            curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+            chmod +x kubectl
+            mv kubectl /usr/local/bin/kubectl
+            
+            # Install Minikube
+            curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+            sudo mv minikube-linux-amd64 /usr/local/bin/minikube
+            sudo chmod +x /usr/local/bin/minikube
+
+            # Start Minikube
+            minikube start --driver=docker
+            
+            # Configure kubectl
+            kubectl config set-cluster minikube --server=https://192.168.49.2:8443
+            kubectl config use-context minikube
 '''
 
             }
