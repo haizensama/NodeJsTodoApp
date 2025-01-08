@@ -67,9 +67,9 @@ sh '''
             echo "export PATH=$HOME/bin:$PATH" >> $HOME/.bashrc
             . $HOME/.bashrc
 
-            # Start Minikube (directly as jenkins user, no need for sudo)
-            echo "Running Minikube as jenkins user"
-            minikube start --driver=docker
+            # Start Minikube as root with --force to bypass docker driver restriction
+            echo "Running Minikube as root with --force"
+            minikube start --driver=docker --force
 
             # Configure kubectl
             kubectl config set-cluster minikube --server=https://192.168.49.2:8443
