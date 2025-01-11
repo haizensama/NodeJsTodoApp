@@ -6,6 +6,7 @@ pipeline {
     environment {
         DOCKER_HUB_CREDENTIALS_ID = 'jen-dockerhub'
         DOCKER_HUB_REPO = 'haizen12/nodejstodoapp'
+        KUBECONFIG = credentials('kubeconfig')
     }
     stages {
         stage('Git Checkout') {
